@@ -22,6 +22,7 @@
 .row {
   width: 52px;
   height: 52px;
+  border-radius: 4px;
   background-color: #2b2b2b;
   display: flex;
   flex-direction: row;
@@ -29,6 +30,11 @@
   align-items: center;
   justify-content: center;
   opacity: 0.6;
+  box-shadow: 1px 0px 6px rgba(0, 0, 0, 0.2);
+
+  @media (prefers-color-scheme: light) {
+    background-color: #f2f2f2;
+  }
 }
 
 .rowActive {
@@ -70,5 +76,12 @@
   border-radius: 12px;
   background-color: #000000;
   outline: none;
-  border: 1px solid #2b2b2b;;
+  border: 1px solid #2b2b2b;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+
+  @media (prefers-color-scheme: light) {
+    background-color: #FFFFFF;
+  }
 }

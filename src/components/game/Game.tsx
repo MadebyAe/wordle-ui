@@ -79,7 +79,6 @@ const Grid: FC<GridProps> = ({ grid, round, word, words }) => {
 const KeyboardManager: FC<KeyboardManagerProps> = ({ onChange, onSubmit, word, onSuccess }) => {
   const inputRef = React.useRef(null);
   const setFocus = () => {
-    console.log('focus?');
     const input = inputRef?.current as unknown as HTMLInputElement;
     if (input) {
       setTimeout(() => input?.focus(), 100);
