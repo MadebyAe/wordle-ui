@@ -1,4 +1,4 @@
-import React, { FC, FormEvent, useLayoutEffect, useEffect, useState } from "react";
+import React, { FC, ChangeEvent, CompositionEvent, FormEvent, useLayoutEffect, useEffect, useState } from "react";
 import styles from "@core/components/game/Game.module.css";
 import cn from "clsx";
 
@@ -13,9 +13,8 @@ export interface WordMap {
 }
 
 export interface KeyboardManagerProps {
- maxLength: number;
  onChange: (value: string) => void;
- onSubmit: () => void;
+ onSubmit: (event: FormEvent<HTMLFormElement>) => void;
  onSuccess: () => void;
  word: string;
 }
@@ -81,9 +80,9 @@ const KeyboardManager: FC<KeyboardManagerProps> = ({ onChange, onSubmit, word, o
   const inputRef = React.useRef(null);
   const setFocus = () => {
     console.log('focus?');
-    const input = inputRef.current;
+    const input = inputRef?.current as unknown as HTMLInputElement;
     if (input) {
-      setTimeout(() => input.focus(), 100);
+      setTimeout(() => input?.focus(), 100);
     }
   };
 
@@ -99,30 +98,32 @@ const KeyboardManager: FC<KeyboardManagerProps> = ({ onChange, onSubmit, word, o
     setFocus();
   });
 
-  const onInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onInput = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event?.target?.value.toUpperCase());
   };
 
-  const onBeforeInput = (event: FormEvent<HTMLInputElement>) => {
+  const onBeforeInput = (event: CompositionEvent<HTMLInputElement>) => {
     const pattern = /^[a-zA-Z]*$/;
+    const data = (event as unknown as InputEvent)?.data;
 
-    if (!pattern.test(event?.data ?? '')) {
+    if (!pattern.test(data ?? '')) {
       event.preventDefault();
 
       return true;
     }
 
-    if (event?.data.length - 1 === word.length) {
+    if ((data ?? '')?.length - 1 === word.length) {
       event.preventDefault();
 
       return true;
     }
   };
 
-  const onEnter = (event: FormEvent<HTMLInputElement>) => {
+  const onEnter = (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const value = event.target.elements?.input?.value;
+    const input = event.currentTarget.elements?.namedItem('input') as HTMLInputElement;
+    const value = input?.value;
 
     if (value.length < word.length) {
       return false;
@@ -137,7 +138,7 @@ const KeyboardManager: FC<KeyboardManagerProps> = ({ onChange, onSubmit, word, o
 
     onChange('');
 
-    onSubmit();
+    onSubmit(event);
   }
 
   return (
@@ -170,12 +171,11 @@ const Game: FC<{ game: GameData, onRefresh: () => void }> = ({ game, onRefresh }
   const onChange = (value: string) => {
     setInput(value);
   };
-  const onSubmit = (event: FormEvent<HTMLInputElement>) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (input.length === game?.word?.length) {
       setRound(round + 1);
     }
 
-    console.log(round, game);
     if (round === game?.rounds - 1) {
       setError(true);
     }

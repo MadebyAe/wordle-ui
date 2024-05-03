@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import styles from "@core/styles/Home.module.css";
 import { Game, GameData } from "@core/components/game";
 import { generate } from "random-words";
+import { GetServerSideProps } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,10 +32,10 @@ const Home: React.FC<{ game: GameData, onRefresh: () => void }> = ({ game }) => 
 
 export default Home;
 
-export async function getServerSideProps({ query }) {
+export const getServerSideProps: GetServerSideProps = (context): any => {
   // This could be an HTTP request to get the game session preferences
-  const x = parseInt(query.x) || 5;
-  const y = parseInt(query.y) || 6;
+  const x = parseInt(context?.query?.x as string) || 5;
+  const y = parseInt(context?.query?.y as string) || 6;
   const grid = [x, y];
   const [wordLength] = grid;
   const word = generate({
