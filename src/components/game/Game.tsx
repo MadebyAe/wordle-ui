@@ -27,23 +27,53 @@ export interface GridProps {
 }
 
 const Rows: FC<{ rows: number, columnIndex: number, words: WordMap, word: string, round: number }> = ({ rows, columnIndex, words, word, round }) => {
-  const wordMapArr = words[columnIndex];
+  const wordInputArr = words[columnIndex];
   const wordArr = word?.split('');
+  let wordRemainingLetters = [...wordArr];
+
+  const exactMap = wordInputArr?.reduce((acc, value, index) => {
+    if (value === wordArr?.[index]) {
+      wordRemainingLetters = wordRemainingLetters.filter(letter => letter !== value);
+      acc[index] = value;
+
+      return acc;
+    }
+    return acc;
+  }, {} as Record<number, string>);
+
+  const fuzzyMap = wordInputArr?.reduce((acc, value, index) => {
+    if (wordRemainingLetters.includes(value)) {
+      wordRemainingLetters = wordRemainingLetters.filter(letter => letter !== value);
+      acc[index] = value;
+
+      return acc;
+    }
+
+    return acc;
+  }, {} as Record<number, string>);
 
   return (
     <>
-      {[...Array(rows).keys() as unknown as number[]]?.map((row: number) => (
-        <div
-          className={cn(styles.row, {
-            [styles.rowActive]: columnIndex === round,
-            [styles.rowFuzzy]: wordArr?.includes(wordMapArr?.[row]) && wordArr?.[row] !== wordMapArr?.[row] && round > columnIndex,
-            [styles.rowExact]: wordArr?.[row] === wordMapArr?.[row] && round > columnIndex,
-          })}
-          key={row.toString()}
-        >
-          {wordMapArr?.[row]}
-        </div>
-      ))}
+      {[...Array(rows).keys() as unknown as number[]]?.map((row: number) => {
+        const isRowComplete = round > columnIndex;
+        const isRowActive =  columnIndex === round;
+        const isRowExact = exactMap?.[row] === wordInputArr?.[row];
+        const isRowFuzzy = fuzzyMap?.[row] === wordInputArr?.[row] && !isRowExact;
+
+        return (
+          <div
+            className={cn(styles.row, {
+              [styles.rowActive]: isRowActive,
+              [styles.rowFuzzy]: isRowFuzzy && isRowComplete,
+              [styles.rowExact]: isRowExact && isRowComplete,
+              [styles.rowInput]: wordInputArr?.[row],
+            })}
+            key={row.toString()}
+          >
+            {wordInputArr?.[row]}
+          </div>
+        );
+      })}
     </>
   );
 };

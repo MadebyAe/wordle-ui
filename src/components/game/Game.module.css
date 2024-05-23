@@ -61,6 +61,11 @@
 
 .rowFuzzy {
   background: orange;
+  animation: 500ms ease 250ms forwards pulse;
+}
+
+.rowInput {
+  animation: 500ms ease 0ms forwards pulse;
 }
 
 .success, .error, .start {
@@ -83,5 +88,19 @@
 
   @media (prefers-color-scheme: light) {
     background-color: #FFFFFF;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }
